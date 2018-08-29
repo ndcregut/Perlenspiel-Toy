@@ -1,0 +1,18 @@
+Error: !
+    at hr (ps3.2.js:3)
+    at xt (ps3.2.js:3)
+    at Lt (ps3.2.js:3)
+    at Object.color (ps3.2.js:3)
+    at Object.sandStop (game.js:48)
+    at Object.tick (game.js:116)
+    at ps3.2.js:3
+    at _clock (ps3.2.js:3)
+ps3.2.js:3 ERROR: [PS.color] x argument not a number
+    ps3.2.js:3
+    ps3.2.js:3
+    ps3.2.js:3
+    ps3.2.js:3
+    game.js:48
+    game.js:116
+    ps3.2.js:3
+    ps3.2.js:3

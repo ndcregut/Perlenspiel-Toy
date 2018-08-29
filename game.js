@@ -26,8 +26,11 @@
 var Sand = {
     // possible colors for the sand
     Color_Default: 0xfff,
-    Drop_Color: 0xeee,
+    Drop_Color: PS.COLOR_RED,
     // other colors
+    
+    // Used to randomly move particle left or right
+    rand: 0,
 
     // Keep track of all active sand particles
     dropsX: [],
@@ -62,6 +65,7 @@ var Sand = {
         // Loop through each active particle, set position or stop it
         i = 0;
         while (i < len) {
+        PS.debug("Got Here!!!\n");
             // Get current active particle
             x = Sand.dropsX[i];
             y = Sand.dropsY[i];
@@ -69,7 +73,7 @@ var Sand = {
             // Check if bead is at the bottom row
             if (y < Meta.BOTTOM_ROW) {
                 // Check if bead is at bottom of currently available grid
-                if (PS.color(x, y + 1) !== PS.DEFAULT) {
+                if (PS.color(x, y + 1) !== Sand.Color_Default) {
                     // Check if bead is allowed to move left or right
                     left = x - 1;
                     right = x + 1;
@@ -78,27 +82,38 @@ var Sand = {
                     if (Sand.checkAvailableSide(left, y) &&
                     Sand.checkAvailableSide(right, y)) {
                         // Random move
-                        //clear current particle
+                        // clear current particle
+                        PS.color(x, y, Sand.Color_Default);
                         // pick random number (-1, 1) and add to x
+                        rand = Math.floor(Math.random() * 2);
+                        x += rand;
                         // change color of new particle
+                        PS.color(x, y, Sand.Drop_Color);
                     // Check individually and move to that side
                     } else if (Sand.checkAvailableSide(left, y)) {
                         //Move to left
                         //clear current particle
+                        PS.color(x, y, Sand.Color_Default);
                         //decrement x by 1
+                        x -=1;                                                                                                                            
                         //change color of new particle
                     } else if (Sand.checkAvailableSide(right, y)) {
                         // Move to right
                         //clear current particle
+                        PS.color(x, y, Sand.Color_Default);
                         //increment x by 1
+                        x +=1;
                         //change color of new particle
-
                     } else { // If not, stop
-                        
+                        Sand.sandStop(x, y, i);
                     }               
                 } else { // Continue to drop particle
-
+                    PS.color(x, y, Sand.Color_Default);
+                    y += 1;
+                    PS.color(x, y, Sand.Drop_Color);
                 }
+            } else {
+                Sand.sandStop(x, y, i);
             }
 
         }
@@ -145,17 +160,29 @@ Called once after engine is initialized but before event-polling begins.
 [options] = an object with optional parameters; see API documentation for details.
 */
 PS.init = function (system, options) {
-    // Verify function is being called
-    PS.debug("PS.init() called\n");
-
     // Set grid size
     // Call first to avoid issues
-    PS.gridSize(8, 8);
+    PS.gridSize(Meta.GRID_WIDTH, Meta.GRID_HEIGHT);
 
     // Display message above grid
-    PS.statusText("Game");
+    PS.statusText("Sand Drop");
 
-    // Other initialization code
-    // ...
+    // Background color
+    PS.gridColor(Sand.Color_Default);
+
+    // Hide all borders
+    PS.border(PS.ALL, PS.ALL, 0);
+
+    // Set all beads to background color
+    PS.color(PS.ALL, PS.ALL, Sand.Color_Default);
+
+    // Start animation timer
+    PS.timerStart(Meta.FRAME_RATE, Sand.tick);
 };
 
+PS.touch = function (x, y, data, options) {
+    PS.color(x, y, Sand.Drop_Color);
+    Sand.dropsX.push(x);
+    Sand.dropsY.push(y);
+    PS.debug(Sand.dropsX[0] + " " + Sand.dropsY[0]);
+};
