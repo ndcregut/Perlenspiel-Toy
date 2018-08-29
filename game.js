@@ -54,7 +54,8 @@ var Sand = {
     tick: function () {
         var len,    // amount of current active particles
             i,      // Current index of particle array
-            x, y;   // X and Y position for current particle
+            x, y,   // X and Y position for current particle
+            left, right;    // Left and Right side of the particle
 
         len = Sand.dropsX.length;
 
@@ -66,14 +67,54 @@ var Sand = {
             y = Sand.dropsY[i];
 
             // Check if bead is at the bottom row
-            
+            if (y < Meta.BOTTOM_ROW) {
+                // Check if bead is at bottom of currently available grid
+                if (PS.color(x, y + 1) !== PS.DEFAULT) {
+                    // Check if bead is allowed to move left or right
+                    left = x - 1;
+                    right = x + 1;
 
-            // Check if bead is at bottom of currently available grid
-                // Check if bead is allowed to move left or right
                     // Check for both and randomly move
+                    if (Sand.checkAvailableSide(left, y) &&
+                    Sand.checkAvailableSide(right, y)) {
+                        // Random move
+                        //clear current particle
+                        // pick random number (-1, 1) and add to x
+                        // change color of new particle
                     // Check individually and move to that side
-                // If not, stop
+                    } else if (Sand.checkAvailableSide(left, y)) {
+                        //Move to left
+                        //clear current particle
+                        //decrement x by 1
+                        //change color of new particle
+                    } else if (Sand.checkAvailableSide(right, y)) {
+                        // Move to right
+                        //clear current particle
+                        //increment x by 1
+                        //change color of new particle
+
+                    } else { // If not, stop
+                        
+                    }               
+                } else { // Continue to drop particle
+
+                }
+            }
+
         }
+    },
+
+    /**
+     * Check to one side of particle to see if it is available to move to that side
+     * @param {number} side The left or right side x value of the current particle
+     * @param {number} y The y value of the current particle
+     */
+    checkAvailableSide: function (side, y) {
+        return (side < Meta.RIGHT_SIDE && side > Meta.LEFT_SIDE &&
+                y < Meta.BOTTOM_ROW &&
+                PS.color(side, y - 1) === PS.DEFAULT &&
+                PS.color(side, y) === PS.DEFAULT &&
+                PS.color(side, y + 1) === PS.DEFAULT);
     }
 };
 
