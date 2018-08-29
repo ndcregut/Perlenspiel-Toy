@@ -16,7 +16,7 @@
 
 /*
  * All additional functions and their uses/parameters can be found at:
- * http://users.wpi.edu/~bmoriarty/ps/api.html\
+ * http://users.wpi.edu/~bmoriarty/ps/api.html
  */
 
 
@@ -26,6 +26,7 @@
 var Sand = {
     // possible colors for the sand
     Color_Default: 0xfff,
+    Drop_Color: 0xeee,
     // other colors
 
     // Keep track of all active sand particles
@@ -35,11 +36,21 @@ var Sand = {
     // FUNCTIONS
     /**
      * Stop particles from moving when they hit the bottom of the available grid
+     * @param {number} x The x position of the particle
+     * @param {number} y The y position of the particle
+     * @param {number} i The index of the particle in the array
      */
-    sandStop: function (x, y) {
+    sandStop: function (x, y, i) {
         // Remove sand from array once hit bottom of available grid
+        PS.color(x, y, Sand.Drop_Color);
+
+        Sand.dropsX.splice(i, 1);
+        Sand.dropsY.splice(i, 1);
     },
 
+    /**
+     * Update the acive sand particles every frame
+     */
     tick: function () {
         var len,    // amount of current active particles
             i,      // Current index of particle array
@@ -48,10 +59,14 @@ var Sand = {
         len = Sand.dropsX.length;
 
         // Loop through each active particle, set position or stop it
+        i = 0;
         while (i < len) {
             // Get current active particle
+            x = Sand.dropsX[i];
+            y = Sand.dropsY[i];
 
             // Check if bead is at the bottom row
+            
 
             // Check if bead is at bottom of currently available grid
                 // Check if bead is allowed to move left or right
@@ -66,13 +81,19 @@ var Sand = {
  * Meta contains information for the game window and definitions
  */
 var Meta = {
+    // Size of the grid
     GRID_WIDTH: 50,
     GRID_HEIGHT: 50,
 
+    // Color of the grid
     BG_COLOR: 0xFFFFFF,
 
+    // Constraints of the grid
     BOTTOM_ROW: 49,
+    LEFT_SIDE: 0,
+    RIGHT_SIDE: 49,
 
+    // How fast the toy runs
     FRAME_RATE: 30
 };
 
