@@ -25,8 +25,8 @@
  */
 var Sand = {
     // possible colors for the sand
-    Color_Default: 0xfff,
-    Drop_Color: PS.COLOR_RED,
+    Color_Default: 0xefefef,
+    Drop_Color: 0xdbd848,
 
     // Used to randomly move particle left or right
     rand: 0,
@@ -58,6 +58,7 @@ var Sand = {
             i,      // Current index of particle array
             x, y,   // X and Y position for current particle
             left, right, // Left and Right side of the particle
+            dragging,    // Used to continuously add particles to grid
             rand;   // Used to randomly move particle left or right
 
         len = Sand.dropsX.length;
@@ -65,7 +66,6 @@ var Sand = {
         // Loop through each active particle, set position or stop it
         i = 0;
         while (i < len) {
-        PS.debug("Got Here!!!\n");
             // Get current active particle
             x = Sand.dropsX[i];
             y = Sand.dropsY[i];
@@ -84,42 +84,65 @@ var Sand = {
                         // Random move
                         // clear current particle
                         PS.color(x, y, Sand.Color_Default);
-                        // pick random number (-1, 1) and add to x
+
+                        // pick random number (0, 1), add to x and save it in array
                         rand = Math.floor(Math.random() * 2);
-                        x += rand;
+                        x += rand == 1 ? 1 : -1;
+                        Sand.dropsX[i] = x;
                         i += 1;
+
                         // change color of new particle
                         PS.color(x, y, Sand.Drop_Color);
+
                     // Check individually and move to that side
                     } else if (Sand.checkAvailableSide(left, y)) {
                         //Move to left
                         //clear current particle
                         PS.color(x, y, Sand.Color_Default);
-                        //decrement x by 1
+
+                        //decrement x by 1 and save it in array
                         x -= 1;
+                        Sand.dropsX[i] = x;
                         i += 1;
+
                         //change color of new particle
+                        PS.color(x, y, Sand.Drop_Color);
+
                     } else if (Sand.checkAvailableSide(right, y)) {
                         // Move to right
                         //clear current particle
                         PS.color(x, y, Sand.Color_Default);
-                        //increment x by 1
+
+                        //increment x by 1 and save it in array
                         x += 1;
+                        Sand.dropsX[i] = x;
                         i += 1;
+
                         //change color of new particle
-                    } else { // If not, stop
+                        PS.color(x, y, Sand.Drop_Color);
+
+                    } else { // Bottom available row, stop particle
                         Sand.sandStop(x, y, i);
+                        len -= 1;
                     }
                 } else { // Continue to drop particle
+                    //clear current particle
                     PS.color(x, y, Sand.Color_Default);
+                    
+                    //increment y by 1 and save it in array
                     y += 1;
+                    Sand.dropsY[i] = y;
+
+                    //change color of new particle
                     PS.color(x, y, Sand.Drop_Color);
+
+                    //move to next index
                     i += 1;
                 }
-            } else {
+            } else { // Bottom row, stop particle
                 Sand.sandStop(x, y, i);
+                len -= 1;
             }
-
         }
     },
 
@@ -129,11 +152,11 @@ var Sand = {
      * @param {number} y The y value of the current particle
      */
     checkAvailableSide: function (side, y) {
-        return (side < Meta.RIGHT_SIDE && side > Meta.LEFT_SIDE &&
+        return (side < Meta.RIGHT_SIDE && side >= 0 &&
                 y < Meta.BOTTOM_ROW &&
-                PS.color(side, y - 1) === PS.DEFAULT &&
-                PS.color(side, y) === PS.DEFAULT &&
-                PS.color(side, y + 1) === PS.DEFAULT);
+                (y === 0 || PS.color(side, y - 1) === Sand.Color_Default) &&
+                PS.color(side, y) === Sand.Color_Default &&
+                PS.color(side, y + 1) === Sand.Color_Default);
     }
 };
 
@@ -142,19 +165,19 @@ var Sand = {
  */
 var Meta = {
     // Size of the grid
-    GRID_WIDTH: 50,
-    GRID_HEIGHT: 50,
+    GRID_WIDTH: 32,
+    GRID_HEIGHT: 32,
 
     // Color of the grid
     BG_COLOR: 0xFFFFFF,
 
     // Constraints of the grid
-    BOTTOM_ROW: 49,
+    BOTTOM_ROW: 0,
     LEFT_SIDE: 0,
-    RIGHT_SIDE: 49,
+    RIGHT_SIDE: 0,
 
     // How fast the toy runs
-    FRAME_RATE: 30
+    FRAME_RATE: 10
 };
 
 /*
@@ -171,9 +194,6 @@ PS.init = function (system, options) {
     // Display message above grid
     PS.statusText("Sand Drop");
 
-    // Background color
-    PS.gridColor(Sand.Color_Default);
-
     // Hide all borders
     PS.border(PS.ALL, PS.ALL, 0);
 
@@ -182,11 +202,27 @@ PS.init = function (system, options) {
 
     // Start animation timer
     PS.timerStart(Meta.FRAME_RATE, Sand.tick);
+
+    // Set Meta information
+    Meta.BOTTOM_ROW = Meta.GRID_HEIGHT - 1;
+    Meta.RIGHT_SIDE = Meta.GRID_WIDTH - 1;
+
+    // Initialize dragging for Sand
+    Sand.dragging = false;
 };
 
 PS.touch = function (x, y, data, options) {
-    PS.color(x, y, Sand.Drop_Color);
-    Sand.dropsX.push(x);
-    Sand.dropsY.push(y);
-    PS.debug(Sand.dropsX[0] + " " + Sand.dropsY[0]);
+    Sand.dragging = true;
 };
+
+PS.release = function (x, y, data, options) {
+    Sand.dragging = false;
+}
+
+PS.enter = function (x, y, data, options) {
+    if(Sand.dragging === true) {
+        PS.color(x, y, Sand.Drop_Color);
+        Sand.dropsX.push(x);
+        Sand.dropsY.push(y);
+    }
+}
