@@ -25,8 +25,17 @@
  */
 var Sand = {
     // possible colors for the sand
+    // each one 4 spaces
     Color_Default: 0xefefef,
-    Drop_Color: 0xdbd848,
+    Color_Current: 0xfff,
+    Color_Yellow: 0xdbd848,
+    Color_Blue: 0x1ac6ff,
+    Color_Pink: 0xff66ff,
+    Color_Orange: 0xff9933,
+    Color_Green: 0x00e600,
+    Color_White: 0xf2f2f2,
+    Color_Black: 0x1a1a1a,
+    Color_Brown: 0x7b481e,
 
     // Used to randomly move particle left or right
     rand: 0,
@@ -44,7 +53,7 @@ var Sand = {
      */
     sandStop: function (x, y, i) {
         // Remove sand from array once hit bottom of available grid
-        PS.color(x, y, Sand.Drop_Color);
+        PS.color(x, y, Sand.Color_Current);
 
         Sand.dropsX.splice(i, 1);
         Sand.dropsY.splice(i, 1);
@@ -59,7 +68,8 @@ var Sand = {
             x, y,   // X and Y position for current particle
             left, right, // Left and Right side of the particle
             dragging,    // Used to continuously add particles to grid
-            rand;   // Used to randomly move particle left or right
+            rand,   // Used to randomly move particle left or right
+            color;  // Color of the currently falling particle
 
         len = Sand.dropsX.length;
 
@@ -69,6 +79,9 @@ var Sand = {
             // Get current active particle
             x = Sand.dropsX[i];
             y = Sand.dropsY[i];
+
+            // Get color of active particle
+            color = PS.color(x, y);
 
             // Check if bead is at the bottom row
             if (y < Meta.BOTTOM_ROW) {
@@ -92,7 +105,7 @@ var Sand = {
                         i += 1;
 
                         // change color of new particle
-                        PS.color(x, y, Sand.Drop_Color);
+                        PS.color(x, y, color);
 
                     // Check individually and move to that side
                     } else if (Sand.checkAvailableSide(left, y)) {
@@ -106,7 +119,7 @@ var Sand = {
                         i += 1;
 
                         //change color of new particle
-                        PS.color(x, y, Sand.Drop_Color);
+                        PS.color(x, y, color);
 
                     } else if (Sand.checkAvailableSide(right, y)) {
                         // Move to right
@@ -119,7 +132,7 @@ var Sand = {
                         i += 1;
 
                         //change color of new particle
-                        PS.color(x, y, Sand.Drop_Color);
+                        PS.color(x, y, color);
 
                     } else { // Bottom available row, stop particle
                         Sand.sandStop(x, y, i);
@@ -134,7 +147,7 @@ var Sand = {
                     Sand.dropsY[i] = y;
 
                     //change color of new particle
-                    PS.color(x, y, Sand.Drop_Color);
+                    PS.color(x, y, color);
 
                     //move to next index
                     i += 1;
@@ -204,25 +217,75 @@ PS.init = function (system, options) {
     PS.timerStart(Meta.FRAME_RATE, Sand.tick);
 
     // Set Meta information
-    Meta.BOTTOM_ROW = Meta.GRID_HEIGHT - 1;
+    Meta.BOTTOM_ROW = Meta.GRID_HEIGHT - 2;
     Meta.RIGHT_SIDE = Meta.GRID_WIDTH - 1;
 
-    // Initialize dragging for Sand
+    // Initialize variables for Sand
+    Sand.Color_Current = Sand.Color_Yellow;
     Sand.dragging = false;
+
+    // Create color palette for sand
+    CreatePalette();
 };
 
 PS.touch = function (x, y, data, options) {
     Sand.dragging = true;
+    OnClick(x, y);
 };
 
 PS.release = function (x, y, data, options) {
     Sand.dragging = false;
-}
+};
 
 PS.enter = function (x, y, data, options) {
     if(Sand.dragging === true) {
-        PS.color(x, y, Sand.Drop_Color);
-        Sand.dropsX.push(x);
-        Sand.dropsY.push(y);
+        CreateParticle(x, y);
     }
+};
+
+function CreatePalette() {
+    var i = 0;
+
+    for (i = 0; i < 4; ++i)
+        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Yellow);
+    
+    for (; i < 8; ++i)
+        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Blue);
+
+    for (; i < 12; ++i)
+        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Pink);
+
+    for (; i < 16; ++i)
+        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Orange);
+
+    for (; i < 20; ++i)
+        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Green);
+
+    for (; i < 24; ++i)
+        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_White);
+
+    for (; i < 28; ++i)
+        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Black);
+
+    for (; i < 32; ++i)
+        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Brown);
+}
+
+function OnClick(x, y) {
+    if (y >= Meta.BOTTOM_ROW) {
+        ChangeColor(x);
+    } else {
+        CreateParticle(x, y);
+    }
+}
+
+function CreateParticle(x, y) {
+    if (PS.color(x, y) !== Sand.Color_Default || y >= Meta.BOTTOM_ROW) return;
+    PS.color(x, y, Sand.Color_Current);
+    Sand.dropsX.push(x);
+    Sand.dropsY.push(y);
+}
+
+function ChangeColor(x) {
+    Sand.Color_Current = PS.color(x, Meta.BOTTOM_ROW - 1);
 }
