@@ -27,8 +27,7 @@ var Sand = {
     // possible colors for the sand
     Color_Default: 0xfff,
     Drop_Color: PS.COLOR_RED,
-    // other colors
-    
+
     // Used to randomly move particle left or right
     rand: 0,
 
@@ -58,7 +57,8 @@ var Sand = {
         var len,    // amount of current active particles
             i,      // Current index of particle array
             x, y,   // X and Y position for current particle
-            left, right;    // Left and Right side of the particle
+            left, right, // Left and Right side of the particle
+            rand;   // Used to randomly move particle left or right
 
         len = Sand.dropsX.length;
 
@@ -87,6 +87,7 @@ var Sand = {
                         // pick random number (-1, 1) and add to x
                         rand = Math.floor(Math.random() * 2);
                         x += rand;
+                        i += 1;
                         // change color of new particle
                         PS.color(x, y, Sand.Drop_Color);
                     // Check individually and move to that side
@@ -95,22 +96,25 @@ var Sand = {
                         //clear current particle
                         PS.color(x, y, Sand.Color_Default);
                         //decrement x by 1
-                        x -=1;                                                                                                                            
+                        x -= 1;
+                        i += 1;
                         //change color of new particle
                     } else if (Sand.checkAvailableSide(right, y)) {
                         // Move to right
                         //clear current particle
                         PS.color(x, y, Sand.Color_Default);
                         //increment x by 1
-                        x +=1;
+                        x += 1;
+                        i += 1;
                         //change color of new particle
                     } else { // If not, stop
                         Sand.sandStop(x, y, i);
-                    }               
+                    }
                 } else { // Continue to drop particle
                     PS.color(x, y, Sand.Color_Default);
                     y += 1;
                     PS.color(x, y, Sand.Drop_Color);
+                    i += 1;
                 }
             } else {
                 Sand.sandStop(x, y, i);
