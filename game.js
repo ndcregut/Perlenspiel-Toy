@@ -190,7 +190,7 @@ var Meta = {
     RIGHT_SIDE: 0,
 
     // How fast the toy runs
-    FRAME_RATE: 10
+    FRAME_RATE: 1
 };
 
 /*
