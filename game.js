@@ -190,7 +190,10 @@ var Meta = {
     RIGHT_SIDE: 0,
 
     // How fast the toy runs
-    FRAME_RATE: 1
+    FRAME_RATE: 1,
+
+    // Location for palette
+    PALETTE_ROW: 0
 };
 
 /*
@@ -218,7 +221,8 @@ PS.init = function (system, options) {
 
     // Set Meta information
     Meta.BOTTOM_ROW = Meta.GRID_HEIGHT - 2;
-    Meta.RIGHT_SIDE = Meta.GRID_WIDTH - 1;
+    Meta.RIGHT_SIDE = Meta.GRID_WIDTH;
+    Meta.PALETTE_ROW = Meta.GRID_HEIGHT - 1;
 
     // Initialize variables for Sand
     Sand.Color_Current = Sand.Color_Yellow;
@@ -247,32 +251,32 @@ function CreatePalette() {
     var i = 0;
 
     for (i = 0; i < 4; ++i)
-        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Yellow);
+        PS.color(i, Meta.PALETTE_ROW, Sand.Color_Yellow);
     
     for (; i < 8; ++i)
-        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Blue);
+        PS.color(i, Meta.PALETTE_ROW, Sand.Color_Blue);
 
     for (; i < 12; ++i)
-        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Pink);
+        PS.color(i, Meta.PALETTE_ROW, Sand.Color_Pink);
 
     for (; i < 16; ++i)
-        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Orange);
+        PS.color(i, Meta.PALETTE_ROW, Sand.Color_Orange);
 
     for (; i < 20; ++i)
-        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Green);
+        PS.color(i, Meta.PALETTE_ROW, Sand.Color_Green);
 
     for (; i < 24; ++i)
-        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_White);
+        PS.color(i, Meta.PALETTE_ROW, Sand.Color_White);
 
     for (; i < 28; ++i)
-        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Black);
+        PS.color(i, Meta.PALETTE_ROW, Sand.Color_Black);
 
     for (; i < 32; ++i)
-        PS.color(i, Meta.GRID_HEIGHT-1, Sand.Color_Brown);
+        PS.color(i, Meta.PALETTE_ROW, Sand.Color_Brown);
 }
 
 function OnClick(x, y) {
-    if (y >= Meta.BOTTOM_ROW) {
+    if (y >= Meta.PALETTE_ROW) {
         ChangeColor(x);
     } else {
         CreateParticle(x, y);
@@ -280,12 +284,12 @@ function OnClick(x, y) {
 }
 
 function CreateParticle(x, y) {
-    if (PS.color(x, y) !== Sand.Color_Default || y >= Meta.BOTTOM_ROW) return;
+    if (PS.color(x, y) !== Sand.Color_Default || y >= Meta.PALETTE_ROW) return;
     PS.color(x, y, Sand.Color_Current);
     Sand.dropsX.push(x);
     Sand.dropsY.push(y);
 }
 
 function ChangeColor(x) {
-    Sand.Color_Current = PS.color(x, Meta.BOTTOM_ROW - 1);
+    Sand.Color_Current = PS.color(x, Meta.PALETTE_ROW);
 }
