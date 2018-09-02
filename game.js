@@ -51,9 +51,9 @@ var Sand = {
      * @param {number} y The y position of the particle
      * @param {number} i The index of the particle in the array
      */
-    sandStop: function (x, y, i) {
+    sandStop: function (x, y, i, color) {
         // Remove sand from array once hit bottom of available grid
-        PS.color(x, y, Sand.Color_Current);
+        PS.color(x, y, color);
 
         Sand.dropsX.splice(i, 1);
         Sand.dropsY.splice(i, 1);
@@ -135,7 +135,7 @@ var Sand = {
                         PS.color(x, y, color);
 
                     } else { // Bottom available row, stop particle
-                        Sand.sandStop(x, y, i);
+                        Sand.sandStop(x, y, i, color);
                         len -= 1;
                     }
                 } else { // Continue to drop particle
@@ -153,7 +153,7 @@ var Sand = {
                     i += 1;
                 }
             } else { // Bottom row, stop particle
-                Sand.sandStop(x, y, i);
+                Sand.sandStop(x, y, i, color);
                 len -= 1;
             }
         }
