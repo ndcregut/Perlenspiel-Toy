@@ -37,8 +37,8 @@ var Sand = {
     Color_Black: 0x1a1a1a,
     Color_Brown: 0x7b481e,
 
-    // Used to randomly move particle left or right
-    rand: 0,
+    // Used to continuously add particles to grid
+    dragging: false,
 
     // Keep track of all active sand particles
     dropsX: [],
@@ -51,10 +51,8 @@ var Sand = {
      * @param {number} y The y position of the particle
      * @param {number} i The index of the particle in the array
      */
-    sandStop: function (x, y, i, color) {
+    sandStop: function (x, y, i) {
         // Remove sand from array once hit bottom of available grid
-        PS.color(x, y, color);
-
         Sand.dropsX.splice(i, 1);
         Sand.dropsY.splice(i, 1);
     },
@@ -67,7 +65,6 @@ var Sand = {
             i,      // Current index of particle array
             x, y,   // X and Y position for current particle
             left, right, // Left and Right side of the particle
-            dragging,    // Used to continuously add particles to grid
             rand,   // Used to randomly move particle left or right
             color;  // Color of the currently falling particle
 
@@ -135,7 +132,7 @@ var Sand = {
                         PS.color(x, y, color);
 
                     } else { // Bottom available row, stop particle
-                        Sand.sandStop(x, y, i, color);
+                        Sand.sandStop(x, y, i);
                         len -= 1;
                     }
                 } else { // Continue to drop particle
@@ -153,7 +150,7 @@ var Sand = {
                     i += 1;
                 }
             } else { // Bottom row, stop particle
-                Sand.sandStop(x, y, i, color);
+                Sand.sandStop(x, y, i);
                 len -= 1;
             }
         }
